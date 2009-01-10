@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Text;
+using System.Threading;
 
 namespace A1
 {
@@ -9,6 +9,9 @@ namespace A1
     {
         static void Main(string[] args)
         {
+            Lager lager = new Lager(50);
+
+            Console.ReadLine();
         }
     }
 }
