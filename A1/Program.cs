@@ -10,6 +10,7 @@ namespace A1
         static void Main(string[] args)
         {
             Lager lager = new Lager(50);
+            lager.Run(); 
 
             Console.ReadLine();
         }

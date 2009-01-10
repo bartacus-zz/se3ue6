@@ -5,17 +5,18 @@ using System.Threading;
 
 namespace A1
 {
-    delegate void ErzeugerEventHandler(object o, EventArgs e);
-
     class Erzeuger : Worker
     {
-        internal event ErzeugerEventHandler Create;
-        internal event ErzeugerEventHandler Start;
-        internal event ErzeugerEventHandler Stop;
+        internal event WorkerLogHandler eCreate;
+        internal event WorkerLogHandler eStart;
+        internal event WorkerLogHandler eStop;
+        internal event WorkerLogHandler eSleep;
 
         protected dPush _push;
         protected int _speed = 5;
         protected bool _active = true;
+
+        protected int _counter = 0;
 
         public Erzeuger(string name, dPush push)
         {
@@ -23,50 +24,59 @@ namespace A1
             this._push = push;
         }
 
-        protected void Start()
+        public void Start()
         {
+            this.OnStart("Starting...");
             this._active = true;
             while (this._active == true)
             {
                 for (int i = 0; i < this._speed; i++)
                 {
                     this._push(new object());
+                    this.OnCreate("Created new object (" + ++this._counter + ")");
                 }
 
+                this.OnSleep("Sleeping for 1000 milliseconds");
                 Thread.Sleep(1000);
             }
         }
 
-        protected void Stop()
+        public void Stop()
         {
-            this.OnStop();
+            this.OnStop("Stopped");
             this._active = false;
         }
 
-        protected WorkerEventArgs getEventArgs()
+        protected WorkerEventArgs getEventArgs(string message)
         {
             WorkerEventArgs args = new WorkerEventArgs();
             args.Name = this.Name;
+            args.Message = message;
             return args;
         }
 
-        private void OnCreate()
+        private void OnCreate(string message)
         {
-            if (Create != null)
-                Create(this, this.getEventArgs());
+            if (eCreate != null)
+                eCreate(this, this.getEventArgs(message));
         }
 
-        private void OnStart()
+        private void OnStart(string message)
         {
-            if (Start != null)
-                Start(this, this.getEventArgs());
+            if (eStart != null)
+                eStart(this, this.getEventArgs(message));
         }
 
-        private void OnStop()
+        private void OnStop(string message)
         {
-            if (Stop != null)
-                Stop(this, this.getEventArgs());
+            if (eStop != null)
+                eStop(this, this.getEventArgs(message));
         }
 
+        private void OnSleep(string message)
+        {
+            if (eSleep != null)
+                eSleep(this, this.getEventArgs(message));
+        }
     }
 }
